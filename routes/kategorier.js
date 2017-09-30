@@ -7,8 +7,7 @@ const connection = mysql.createConnection({
 module.exports = (server) => {
     server.get('/kategorier', (req, res) => {
         const query = `select distinct navn as kategori, id
-    from kategori
-     order by id desc`;
+    from kategori`;
         connection.query(query, (err, results) => {
             if (err) {
                 res.status(500);
