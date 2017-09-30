@@ -55,7 +55,6 @@ module.exports = (server) => {
             or produkter.navn like "%"?"%"
             or producent.navn like "%"?"%"
             `;
-                
         connection.query(query,[req.params.id,req.params.id,req.params.id,req.params.id], (err, results) => {
             if (err) {
                 res.status(500);
