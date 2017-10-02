@@ -42,8 +42,7 @@ module.exports = (server) => {
         });
     });
     server.get('/search/:id', (req, res) => {
-        //const prepare = `${req.params.id}`
-        //console.log(prepare);
+        //const r = req.params.id
         const query = `select produkter.*, kategori.navn as kategori, producent.navn as producent
         from produkter
         inner join kategori

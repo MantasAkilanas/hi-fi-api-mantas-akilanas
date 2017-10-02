@@ -19,4 +19,28 @@ module.exports = (server) => {
             }
         });
     });
+    server.post('/createKontakt', (req, res) => {
+
+        let values = [];
+        values.push(req.body.navn);
+        values.push(req.body.mobil);
+        values.push(req.body.email);
+        values.push(req.body.besked);
+        console.log(values);
+        connection.execute('insert into kontakt(navn,mobil,email,besked) values (?,?,?,?)', values, (err, rows) => {
+            if (err) {
+                console.log(err);
+                res.json(500, {
+                    "message": "Internal Server Error",
+                    "error": err
+                })
+            }
+            else {
+                res.json(200, {
+
+                    "message": "Data indsat"
+                })
+            }
+        })
+    });
 };
