@@ -6,8 +6,13 @@ const server = restify.createServer({
 });
 const logger = require("morgan");
 server.use(logger("dev"));
+server.use(restify.plugins.acceptParser(server.acceptable));
 server.use(restify.plugins.bodyParser());
-const cors = corsmiddleware({ origins: ['*'] });
+server.use(restify.plugins.jsonp());
+const cors = corsmiddleware({
+    'origins': ['*'],
+    'allowHeaders': ['Authorization', 'userID']
+});
 server.pre(cors.preflight);
 server.use(cors.actual);
 require("./routes/index")(server);

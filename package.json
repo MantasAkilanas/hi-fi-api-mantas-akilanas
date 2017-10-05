@@ -21,6 +21,7 @@
     "morgan": "^1.8.2",
     "mysql2": "^1.4.2",
     "nodemon": "^1.12.1",
+    "password-hash": "^1.2.2",
     "restify": "^6.0.0",
     "restify-cors-middleware": "^1.0.1"
   }

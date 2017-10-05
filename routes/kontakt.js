@@ -38,7 +38,7 @@ module.exports = (server) => {
             else {
                 res.json(200, {
 
-                    "message": "Data indsat"
+                    "message": "Data Succesfully Added"
                 })
             }
         })

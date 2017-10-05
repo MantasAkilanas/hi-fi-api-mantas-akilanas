@@ -5,5 +5,6 @@ module.exports = (server) =>{
     require("./kategorier")(server);
     require("./account")(server);
     require("./kontakt")(server);
+    require("./users")(server);
 
 }
