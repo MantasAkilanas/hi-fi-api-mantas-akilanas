@@ -18,6 +18,7 @@
   },
   "homepage": "https://github.com/wi73a-praktisk-web/hi-fi-api-mantas-akilanas#readme",
   "dependencies": {
+    "formidable": "^1.1.1",
     "morgan": "^1.8.2",
     "mysql2": "^1.4.2",
     "nodemon": "^1.12.1",

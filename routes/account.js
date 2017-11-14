@@ -23,7 +23,7 @@ module.exports = (server) => {
                 console.log(results);
                 if (results.length > 0) {
                     console.log("occupied");
-                    res.json(200,{
+                    res.json(200, {
                         "message": "Brugernavn eller email er optaged"
                     })
                 }
@@ -56,34 +56,78 @@ module.exports = (server) => {
         })
     });
     server.post('/login', (req, res) => {
-        
-                let values = [];
-                values.push(req.body.brugernavn);;
-                console.log(values);
-                connection.query(`select * from account where account.brugernavn = ?`, values, (err, results) => {
-                    if (err) {
-                        console.log(err);
-                    }
-                    else {
-                        if (passwordHash.verify(req.body.password, results[0].password)) {
-                            crypto.randomBytes(256, (err, buf) => {
-                                if (err) return res.status(500).end();
-                                else {
-                                    const token = buf.toString('hex');
-                                    console.log(results[0].password.length);
-                                    connection.execute('INSERT INTO accesstokens SET userid = ?, token = ?', [results[0].id, token], (insError) => {
-                                        if (insError) return res.status(500).end();
-                                        else return res.send({ "ID": results[0].id, "AccessToken": token, message : "You have succesfully logged in"});    
-                                    });
-                                }
+
+        let values = [];
+        values.push(req.body.brugernavn);
+        console.log(values);
+        connection.query(`select * from account where account.brugernavn = ?`, values, (err, results) => {
+            if (err) {
+                console.log(err);
+            }
+            else {
+                if (passwordHash.verify(req.body.password, results[0].password)) {
+                    slet(results[0].id);
+                    crypto.randomBytes(256, (err, buf) => {
+                        if (err) return res.status(500).end();
+                        else {
+                            const token = buf.toString('hex');
+                            connection.execute('INSERT INTO accesstokens SET userid = ?, token = ?', [results[0].id, token], (insError) => {
+                                if (insError) return res.status(500).end();
+                                else return res.send({ "ID": results[0].id, "AccessToken": token, message: "You have succesfully logged in" });
                             });
-                        } else {
-                            // res.send(401);
-                            res.json(401,{
-                                        "message":"wrong username or password"
-                                    })
                         }
-                    }
-                })
-            });
+                    });
+
+
+                } else {
+                    // res.send(401);
+                    res.json(401, {
+                        "message": "wrong username or password"
+                    })
+                }
+
+            }
+
+        })
+
+    });
+    // server.post("/logedin", (req, res) => {
+
+    //     if (req.header("userID") != undefined && req.header("Authorization") != undefined) {
+    //         let values = [];
+    //         values.push(req.header("userID"));
+    //         values.push(req.header("Authorization"));
+    //         console.log(values);
+    //         connection.query(`select * from accesstokens where userID = ? and token = ?`, values, (err, result) => {
+    //             if (err) {
+    //                 res.json(401, {
+    //                     "message": "something went wrong"
+    //                 })
+    //             }
+    //             if (result.length > 0) {
+
+    //                 res.json(200, {
+
+    //                     "message": "logedin"
+
+    //                 })
+    //                 console.log("hello");
+
+    //             }
+    //             res.json(401, {
+    //                 "message": "something went wrong"
+    //             })
+    //         })
+    //     }
+    // })
+}
+
+function slet(stuff) {
+    connection.query(`delete from accesstokens where userID=?`, stuff, (err, results) => {
+        if (err) {
+            console.log(err);
+        }
+        else {
+        }
+    })
 }

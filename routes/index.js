@@ -6,5 +6,6 @@ module.exports = (server) =>{
     require("./account")(server);
     require("./kontakt")(server);
     require("./users")(server);
-
+    require("./producent")(server);
+    require("./images")(server);
 }

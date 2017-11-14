@@ -7,7 +7,12 @@ const server = restify.createServer({
 const logger = require("morgan");
 server.use(logger("dev"));
 server.use(restify.plugins.acceptParser(server.acceptable));
-server.use(restify.plugins.bodyParser());
+server.use(restify.plugins.bodyParser({
+    mapParms: true,
+    mapFiles: true,
+    keepExtensions: true,
+    uploadDir: './temp'
+ }));
 server.use(restify.plugins.jsonp());
 const cors = corsmiddleware({
     'origins': ['*'],

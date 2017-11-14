@@ -11,7 +11,7 @@ module.exports = (server) => {
     inner join kategori
         on fk_kategori = kategori.id
     inner join producent
-        on fk_producent = producent.id order by id desc limit 4`;
+        on fk_producent = producent.id where produkter.visible = 1 order by id desc limit 4`;
         connection.query(query, (err, results) => {
             if (err) {
                 res.status(500);

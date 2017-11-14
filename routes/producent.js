@@ -5,28 +5,27 @@ const connection = mysql.createConnection({
     "database": "hifi"
 });
 module.exports = (server) => {
-    server.get('/kategorier', (req, res) => {
-        const query = `select produkter.billede, produkter.fk_kategori as id, kategori.navn as kategori
-    from produkter inner join
-    kategori on fk_kategori = kategori.id`;
-        connection.query(query, (err, results) => {
-            if (err) {
-                res.status(500);
-                res.end;
-            }
-            else {
-                res.setHeader('Access-Control-Allow-Origin', "*");
-                res.send(results);
-            }
-        });
-    })
-    server.post('/createKategori', (req, res) => {
+    // server.get('/producent', (req, res) => {
+    //     const query = `select navn, id 
+    //     from producent`;
+    //     connection.query(query, (err, results) => {
+    //         if (err) {
+    //             res.status(500);
+    //             res.end;
+    //         }
+    //         else {
+    //             res.setHeader('Access-Control-Allow-Origin', "*");
+    //             res.send(results);
+    //         }
+    //     });
+    // })
+    server.post('/createProducent', (req, res) => {
         let values = [];
         values.push(req.body.navn);
         values.push(req.body.id);
         values.push(req.body.id2);
         console.log(values);
-        connection.query('select navn, id, visible  from kategori where navn = ? or id = ? or id = ?', values, (err, rows) => {
+        connection.query('select navn, id, visible  from producent where navn = ? or id = ? or id = ?', values, (err, rows) => {
             if (err) {
                 console.log(err);
                 res.json(500, {
@@ -37,7 +36,7 @@ module.exports = (server) => {
             else {
                 console.log(rows.length)
                 if (rows.length == 0) {
-                    connection.execute('insert into kategori(navn) values (?)', [req.body.navn], (err, rows) => {
+                    connection.execute('insert into producent(navn) values (?)', [req.body.navn], (err, rows) => {
                         if (err) {
                             console.log(err);
                             res.json(500, {
@@ -55,7 +54,7 @@ module.exports = (server) => {
                 }
                 else {
                     if (rows[0].visible == 0) {
-                        connection.execute('update kategori set visible = 1 where id = ? ', [rows[0].id], (err, rows) => {
+                        connection.execute('update producent set visible = 1 where id = ? ', [rows[0].id], (err, rows) => {
                             if (err) {
                                 res.json(500, {
                                     "message": "Internal Server Error",
@@ -71,7 +70,7 @@ module.exports = (server) => {
                         })
                     }
                     else {
-                        connection.execute('update kategori set navn = ?, id = ? where id = ? ', values, (err, rows) => {
+                        connection.execute('update producent set navn = ?, id = ? where id = ? ', values, (err, rows) => {
                             if (err) {
                                 res.json(500, {
                                     "message": "Internal Server Error",
@@ -91,11 +90,11 @@ module.exports = (server) => {
         })
 
     });
-    server.put('/deleteKategori', (req, res) => {
+    server.put('/deleteProducent', (req, res) => {
         let values = [];
         values.push(req.body.id);
         console.log(values);
-        connection.execute('update kategori set visible = 0 where id = ? ', [req.body.id], (err, rows) => {
+        connection.execute('update producent set visible = 0 where id = ? ', [req.body.id], (err, rows) => {
             if (err) {
                 res.json(500, {
                     "message": "Internal Server Error",
@@ -110,11 +109,11 @@ module.exports = (server) => {
             }
         })
     })
-    server.put('/deletePermaKategori', (req, res) => {
+    server.put('/deletePermaProducent', (req, res) => {
         let values = [];
         values.push(req.body.id);
         console.log(values);
-        connection.execute('delete from kategori where id = ? ', [req.body.id], (err, rows) => {
+        connection.execute('delete from producent where id = ? ', [req.body.id], (err, rows) => {
             if (err) {
                 res.json(500, {
                     "message": "Internal Server Error",
@@ -129,9 +128,9 @@ module.exports = (server) => {
             }
         })
     })
-     server.get('/kategori', (req, res) => {
+     server.get('/producent', (req, res) => {
         const query = `select navn, id
-        from kategori where visible = 1`;
+        from producent where visible = 1`;
         connection.query(query, (err, results) => {
             if (err) {
                 res.status(500);
@@ -143,10 +142,10 @@ module.exports = (server) => {
             }
         });
     })
-    server.get('/kategori/:id', (req, res) => {
+    server.get('/producent/:id', (req, res) => {
         //const r = req.params.id
         const query = `select *
-        from kategori where
+        from producent where
             navn like "%"?"%"
             or id like "%"?"%"
             `;
