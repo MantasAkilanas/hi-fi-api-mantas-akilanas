@@ -1,4 +1,5 @@
 const mysql = require("mysql2");
+const security = require('../services/security');
 const connection = mysql.createConnection({
     "user": "root",
     "host": "localhost",
@@ -19,7 +20,7 @@ module.exports = (server) => {
     //         }
     //     });
     // })
-    server.post('/createProducent', (req, res) => {
+    server.post('/createProducent',security.isAuthenticated, (req, res) => {
         let values = [];
         values.push(req.body.navn);
         values.push(req.body.id);
@@ -90,7 +91,7 @@ module.exports = (server) => {
         })
 
     });
-    server.put('/deleteProducent', (req, res) => {
+    server.put('/deleteProducent',security.isAuthenticated, (req, res) => {
         let values = [];
         values.push(req.body.id);
         console.log(values);
@@ -109,7 +110,7 @@ module.exports = (server) => {
             }
         })
     })
-    server.put('/deletePermaProducent', (req, res) => {
+    server.put('/deletePermaProducent', security.isAuthenticated,(req, res) => {
         let values = [];
         values.push(req.body.id);
         console.log(values);

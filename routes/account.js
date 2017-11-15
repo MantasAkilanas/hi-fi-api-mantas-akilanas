@@ -65,25 +65,27 @@ module.exports = (server) => {
                 console.log(err);
             }
             else {
-                if (passwordHash.verify(req.body.password, results[0].password)) {
-                    slet(results[0].id);
-                    crypto.randomBytes(256, (err, buf) => {
-                        if (err) return res.status(500).end();
-                        else {
-                            const token = buf.toString('hex');
-                            connection.execute('INSERT INTO accesstokens SET userid = ?, token = ?', [results[0].id, token], (insError) => {
-                                if (insError) return res.status(500).end();
-                                else return res.send({ "ID": results[0].id, "AccessToken": token, message: "You have succesfully logged in" });
-                            });
-                        }
-                    });
+                if (results.length != 0) {
+                    if (passwordHash.verify(req.body.password, results[0].password)) {
+                        slet(results[0].id);
+                        crypto.randomBytes(256, (err, buf) => {
+                            if (err) return res.status(500).end();
+                            else {
+                                const token = buf.toString('hex');
+                                connection.execute('INSERT INTO accesstokens SET userid = ?, token = ?', [results[0].id, token], (insError) => {
+                                    if (insError) return res.status(500).end();
+                                    else return res.send({ "ID": results[0].id, "AccessToken": token, message: "You have succesfully logged in" });
+                                });
+                            }
+                        });
 
 
-                } else {
-                    // res.send(401);
-                    res.json(401, {
-                        "message": "wrong username or password"
-                    })
+                    } else {
+                        // res.send(401);
+                        res.json(401, {
+                            "message": "wrong username or password"
+                        })
+                    }
                 }
 
             }

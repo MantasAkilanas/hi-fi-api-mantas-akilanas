@@ -1,6 +1,7 @@
 const mysql = require("mysql2");
 const fs = require("fs");
 const path = require("path");
+const security = require('../services/security');
 const connection = mysql.createConnection({
     "user": "root",
     "host": "localhost",
@@ -86,7 +87,7 @@ module.exports = (server) => {
             }
         });
     });
-    server.post('/createProdukt', (req, res) => {
+    server.post('/createProdukt',security.isAuthenticated, (req, res) => {
         // let values = [];
         // values.push(req.body.navn);
         // values.push(req.body.id);
@@ -94,19 +95,8 @@ module.exports = (server) => {
         // console.log(values);
         // console.log(req.body.kategori);
         // console.log(req.body.producent);
-        if (req.files.picture.name != '') {
-            // gem det nye nan
-            image = req.files.picture.name;
-            // flyt den uploadede midlertidige fil til billede mappen 
-            var temp_image = fs.createReadStream('./' + req.files.picture.path); // input stream
-            var final_image = fs.createWriteStream('./public/assets/media/' + image); // output stream
-            temp_image.pipe(final_image);
-            temp_image.on('end', function () {
-                // slet den midlertidige fil, når "final_image" er oprettet  
-                fs.unlink('./' + req.files.picture.path);
-            })
-        }
-        connection.query('select navn, id, visible from produkter where navn = ? or id = ? or id = ?', [req.body.navn,req.body.id,req.body.id2], (err, rows) => {
+        console.log(req.body.oldpicture);
+        connection.query('select navn, id, visible from produkter where navn = ? or id = ? or id = ?', [req.body.navn, req.body.id, req.body.id2], (err, rows) => {
             if (err) {
                 console.log(err);
                 res.json(500, {
@@ -117,7 +107,7 @@ module.exports = (server) => {
             else {
                 console.log(rows.length)
                 if (rows.length == 0) {
-                    connection.execute('insert into produkter(navn,fk_kategori,fk_producent,pris,antal,billede) values (?,?,?,?,?,?)', [req.body.navn, req.body.kategori, req.body.producent, req.body.pris, req.body.antal,req.files.picture.name], (err, rows) => {
+                    connection.execute('insert into produkter(navn,fk_kategori,fk_producent,pris,antal,billede) values (?,?,?,?,?,?)', [req.body.navn, req.body.kategori, req.body.producent, req.body.pris, req.body.antal, req.files.picture.name], (err, rows) => {
                         if (err) {
                             console.log(err);
                             res.json(500, {
@@ -126,9 +116,21 @@ module.exports = (server) => {
                             })
                         }
                         else {
+                            if (req.files.picture.name != '') {
+                                // gem det nye nan
+                                image = req.files.picture.name;
+                                // flyt den uploadede midlertidige fil til billede mappen 
+                                var temp_image = fs.createReadStream('./' + req.files.picture.path); // input stream
+                                var final_image = fs.createWriteStream('./public/assets/media/' + image); // output stream
+                                temp_image.pipe(final_image);
+                                temp_image.on('end', function () {
+                                    // slet den midlertidige fil, når "final_image" er oprettet  
+                                    fs.unlink('./' + req.files.picture.path);
+                                })
+                            }
                             res.json(200, {
 
-                                "message": "Data indsat"
+                                "message": "succes"
                             })
                         }
                     })
@@ -145,13 +147,13 @@ module.exports = (server) => {
                             else {
                                 res.json(200, {
 
-                                    "message": "Data is visible again"
+                                    "message": "succes"
                                 })
                             }
                         })
                     }
                     else {
-                        connection.execute('update produkter set navn = ?, id = ?, fk_kategori =?, fk_producent =?, pris =?, antal=?,billede = ?  where id = ? ', [req.body.navn, req.body.id, req.body.kategori, req.body.producent, req.body.pris, req.body.antal,req.files.picture.name, req.body.id2], (err, rows) => {
+                        connection.execute('update produkter set navn = ?, id = ?, fk_kategori =?, fk_producent =?, pris =?, antal=?,billede = ?  where id = ? ', [req.body.navn, req.body.id, req.body.kategori, req.body.producent, req.body.pris, req.body.antal, req.files.picture.name, req.body.id2], (err, rows) => {
                             if (err) {
                                 res.json(500, {
                                     "message": "Internal Server Error",
@@ -159,9 +161,27 @@ module.exports = (server) => {
                                 })
                             }
                             else {
+                                console.log('./public/assets/media/' + req.body.oldpicture);
+                                if (req.body.oldpicture != req.files.picture.name) {
+                                    if (fs.existsSync('./public/assets/media/' + req.body.oldpicture)) {
+                                        fs.unlinkSync('./public/assets/media/' + req.body.oldpicture);
+                                    }
+                                    if (req.files.picture.name != '') {
+                                        // gem det nye nan
+                                        image = req.files.picture.name;
+                                        // flyt den uploadede midlertidige fil til billede mappen 
+                                        var temp_image = fs.createReadStream('./' + req.files.picture.path); // input stream
+                                        var final_image = fs.createWriteStream('./public/assets/media/' + image); // output stream
+                                        temp_image.pipe(final_image);
+                                        temp_image.on('end', function () {
+                                            // slet den midlertidige fil, når "final_image" er oprettet  
+                                            fs.unlink('./' + req.files.picture.path);
+                                        })
+                                    }
+                                }
                                 res.json(200, {
 
-                                    "message": "Data updated"
+                                    "message": "succes"
                                 })
                             }
                         })
@@ -171,7 +191,7 @@ module.exports = (server) => {
         })
 
     });
-    server.put('/deleteProdukt', (req, res) => {
+    server.put('/deleteProdukt',security.isAuthenticated, (req, res) => {
         let values = [];
         values.push(req.body.id);
         console.log(values);
@@ -190,23 +210,31 @@ module.exports = (server) => {
             }
         })
     })
-    server.put('/deletePermaProdukt', (req, res) => {
-        let values = [];
-        values.push(req.body.id);
-        console.log(values);
-        connection.execute('delete from produkter where id = ? ', [req.body.id], (err, rows) => {
+    server.put('/deletePermaProdukt',security.isAuthenticated, (req, res) => {
+        connection.query("select billede from produkter where id = ?", [req.body.id], (err, billede) => {
             if (err) {
-                res.json(500, {
-                    "message": "Internal Server Error",
-                    "error": err
-                })
+                console.log(err);
             }
             else {
-                res.json(200, {
+                connection.execute('delete from produkter where id = ? ', [req.body.id], (err, rows) => {
+                    if (err) {
+                        res.json(500, {
+                            "message": "Internal Server Error",
+                            "error": err
+                        })
+                    }
+                    else {
+                        if (fs.existsSync('./public/assets/media/' + billede[0].billede)) {
+                            fs.unlinkSync('./public/assets/media/' + billede[0].billede);
+                        }
+                        res.json(200, {
 
-                    "message": "Data deleted"
+                            "message": "Data deleted"
+                        })
+                    }
                 })
             }
+
         })
     })
 };
