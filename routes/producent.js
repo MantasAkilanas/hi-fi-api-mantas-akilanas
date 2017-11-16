@@ -20,7 +20,7 @@ module.exports = (server) => {
     //         }
     //     });
     // })
-    server.post('/createProducent',security.isAuthenticated, (req, res) => {
+    server.post('/createProducent', (req, res) => {
         let values = [];
         values.push(req.body.navn);
         values.push(req.body.id);
@@ -110,7 +110,7 @@ module.exports = (server) => {
             }
         })
     })
-    server.put('/deletePermaProducent', security.isAuthenticated,(req, res) => {
+    server.del('/deletePermaProducent', security.isAuthenticated,(req, res) => {
         let values = [];
         values.push(req.body.id);
         console.log(values);

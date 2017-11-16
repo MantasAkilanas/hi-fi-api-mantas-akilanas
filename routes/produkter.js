@@ -210,7 +210,7 @@ module.exports = (server) => {
             }
         })
     })
-    server.put('/deletePermaProdukt',security.isAuthenticated, (req, res) => {
+    server.del('/deletePermaProdukt',security.isAuthenticated, (req, res) => {
         connection.query("select billede from produkter where id = ?", [req.body.id], (err, billede) => {
             if (err) {
                 console.log(err);

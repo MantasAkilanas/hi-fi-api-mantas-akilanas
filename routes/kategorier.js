@@ -111,7 +111,7 @@ module.exports = (server) => {
             }
         })
     })
-    server.put('/deletePermaKategori',security.isAuthenticated, (req, res) => {
+    server.del('/deletePermaKategori',security.isAuthenticated, (req, res) => {
         let values = [];
         values.push(req.body.id);
         console.log(values);
